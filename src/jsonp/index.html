@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>监听页面 jsonp 请求</title>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+</head>
+
+<body>
+  <script>
+    const callbackFunctionNames = ['callback'];
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(record => {
+        record.addedNodes.forEach(node => {
+          if (node.tagName !== 'SCRIPT') {
+            return;
+          }
+          // 不严谨，只能探测 callback 固定的 jsonp 请求
+          try {
+            const { search } = new URL(node.src);
+            for (let i = 0; i < callbackFunctionNames.length; i++) {
+              if (search.indexOf(callbackFunctionNames[i]) !== -1) {
+                console.log(node.src);
+                break;
+              }
+            }
+          } catch (ex) {
+
+          }
+        });
+      });
+    });
+
+    observer.observe(document.head, {
+      childList: true,
+      attributeFilter: ['src'],
+    });
+  </script>
+  <script>
+    setInterval(() => {
+      $.ajax({
+        url: 'your_jsonp_request_url',
+        dataType: 'jsonp',
+      }).done(res => {
+        console.log(res);
+      })
+    }, 1000);
+  </script>
+</body>
+
+</html>
