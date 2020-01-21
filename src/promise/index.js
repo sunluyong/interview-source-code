@@ -22,7 +22,6 @@ class MyPromise {
     }
 
     if (!callback.onFulfilled) {
-      console.log(111)
       callback.resolve(this.value);
       return;
     }
